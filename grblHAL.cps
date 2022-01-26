@@ -86,7 +86,7 @@ properties = {
       {title: "G53", id: "G53"},
       {title: "Clearance Height", id: "clearanceHeight"}
     ],
-    value: "G28",
+    value: "clearanceHeight",
     scope: "post"
   },
   showSequenceNumbers: {
@@ -131,7 +131,7 @@ properties = {
     title: "Output M6",
     description: "Disable to disallow the output of M6 on tool changes.",
     type: "boolean",
-    value: false,
+    value: true,
     scope: "post"
   },
   splitFile: {
@@ -151,7 +151,7 @@ properties = {
     description: "Set desired time to spin up spindle",
     group: 1,
     type: "integer",
-    value: 2,
+    value: 3,
     scope: "post"
   },
   fourthAxisAround: {
@@ -684,6 +684,9 @@ function onSection() {
 
   if (insertToolCall) {
     setCoolant(COOLANT_OFF);
+    writeBlock(gFormat.format(4), "P" + secFormat.format(2));
+    writeBlock(
+      sOutput.format(0), mFormat.format(5));
 
     if (tool.number > numberOfToolSlots) {
       warning(localize("Tool number exceeds maximum value."));
@@ -716,6 +719,8 @@ function onSection() {
         writeComment(localize("ZMIN") + "=" + zRange.getMinimum());
       }
     }
+	writeBlock(gFormat.format(4), "P" + secFormat.format(1));
+	writeBlock(gFormat.format(4), "P" + secFormat.format(1));
   }
   
   if (insertToolCall ||
@@ -725,9 +730,10 @@ function onSection() {
     if (spindleSpeed < 1) {
       error(localize("Spindle speed out of range."));
     }
-    if (spindleSpeed > 99999) {
+    if (spindleSpeed > 4500) {
       warning(localize("Spindle speed exceeds maximum value."));
     }
+	writeBlock(gFormat.format(4), "P" + secFormat.format(1));
     writeBlock(
       sOutput.format(spindleSpeed), mFormat.format(tool.clockwise ? 3 : 4)
     );
